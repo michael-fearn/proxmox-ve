@@ -1,0 +1,7 @@
+scrape_configs:
+  - job_name: cadvisor
+    static_configs:
+    - targets: ['cadvisor:8080']
+  - job_name: valheim
+    static_configs:
+    - targets: ['valheim:2459']

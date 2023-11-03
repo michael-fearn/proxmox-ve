@@ -1,0 +1,62 @@
+version: "2.4"
+services:
+  valheim:
+    image: mbround18/valheim:latest
+    container_name: valheim
+    restart: unless-stopped
+    ports:
+      - 2456:2456/udp
+      - 2457:2457/udp
+      - 2458:2458/udp
+      - 2459:2459/tcp
+    environment:
+      PUBLIC: 1
+      PORT: 2456
+      NAME: "Created With Valheim Docker"
+      WORLD: ""
+      PASSWORD: "Strong! Password @ Here"
+      TZ: "America/Chicago"
+      AUTO_UPDATE: 0
+      AUTO_UPDATE_SCHEDULE: "0 1 * * *"
+      AUTO_BACKUP: 1
+      AUTO_BACKUP_SCHEDULE: "*/15 * * * *"
+      AUTO_BACKUP_REMOVE_OLD: 1
+      AUTO_BACKUP_DAYS_TO_LIVE: 3
+      AUTO_BACKUP_ON_UPDATE: 1
+      AUTO_BACKUP_ON_SHUTDOWN: 1
+      # WEBHOOK_URL: "https://discord.com/api/webhooks/IM_A_SNOWFLAKE/AND_I_AM_A_SECRET"
+      # WEBHOOK_INCLUDE_PUBLIC_IP: 1
+      UPDATE_ON_STARTUP: 0
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    ports:
+      - 9090:9090/tcp
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - 3000:3000/tcp
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: password
+  cadvisor:
+    image: gcr.io/google-containers/cadvisor:latest
+    container_name: cadvisor
+    restart: always
+    ports:
+      - 8080:8080/tcp
+    privileged: true
+    command:
+      # Defaults to 1s interval, 5s interval for reduced cpu
+      - "-housekeeping_interval=5s"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
